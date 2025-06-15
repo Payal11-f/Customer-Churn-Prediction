@@ -1,35 +1,79 @@
 import streamlit as st
-import pandas as pd
 import numpy as np
+import pandas as pd
 import joblib
 
-# Load the trained model
-model = joblib.load("model.pkl")  # Or replace with .sav or .pkl
+# Load your trained model
+model = joblib.load("model.pkl")
 
-st.title("📉 Customer Churn Prediction")
-st.write("This app predicts whether a customer will churn based on input features.")
+st.title("📉 Customer Churn Prediction App")
 
-# Sample inputs — replace with your actual features
-gender = st.selectbox("Gender", ["Male", "Female"])
-senior = st.selectbox("Senior Citizen", ["Yes", "No"])
-tenure = st.slider("Tenure (Months)", 0, 72, 12)
-monthly_charges = st.number_input("Monthly Charges", 0.0, 200.0, 70.0)
+# Sidebar inputs
+st.sidebar.header("Customer Information")
 
-# You can add more fields based on your model's features
+gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
+SeniorCitizen = st.sidebar.selectbox("Senior Citizen", ["Yes", "No"])
+Partner = st.sidebar.selectbox("Partner", ["Yes", "No"])
+Dependents = st.sidebar.selectbox("Dependents", ["Yes", "No"])
+tenure = st.sidebar.slider("Tenure (Months)", 0, 72, 12)
+PhoneService = st.sidebar.selectbox("Phone Service", ["Yes", "No"])
+MultipleLines = st.sidebar.selectbox("Multiple Lines", ["Yes", "No", "No phone service"])
+InternetService = st.sidebar.selectbox("Internet Service", ["DSL", "Fiber optic", "No"])
+OnlineSecurity = st.sidebar.selectbox("Online Security", ["Yes", "No", "No internet service"])
+OnlineBackup = st.sidebar.selectbox("Online Backup", ["Yes", "No", "No internet service"])
+DeviceProtection = st.sidebar.selectbox("Device Protection", ["Yes", "No", "No internet service"])
+TechSupport = st.sidebar.selectbox("Tech Support", ["Yes", "No", "No internet service"])
+StreamingTV = st.sidebar.selectbox("Streaming TV", ["Yes", "No", "No internet service"])
+StreamingMovies = st.sidebar.selectbox("Streaming Movies", ["Yes", "No", "No internet service"])
+Contract = st.sidebar.selectbox("Contract", ["Month-to-month", "One year", "Two year"])
+PaperlessBilling = st.sidebar.selectbox("Paperless Billing", ["Yes", "No"])
+PaymentMethod = st.sidebar.selectbox("Payment Method", [
+    "Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"
+])
+MonthlyCharges = st.sidebar.number_input("Monthly Charges", 0.0, 200.0, 70.0)
+TotalCharges = st.sidebar.number_input("Total Charges", 0.0, 10000.0, 1000.0)
 
-# Preprocess inputs — this must match your training preprocessing
-gender = 1 if gender == "Male" else 0
-senior = 1 if senior == "Yes" else 0
+# Convert to DataFrame
+input_dict = {
+    'gender': [gender],
+    'SeniorCitizen': [1 if SeniorCitizen == "Yes" else 0],
+    'Partner': [Partner],
+    'Dependents': [Dependents],
+    'tenure': [tenure],
+    'PhoneService': [PhoneService],
+    'MultipleLines': [MultipleLines],
+    'InternetService': [InternetService],
+    'OnlineSecurity': [OnlineSecurity],
+    'OnlineBackup': [OnlineBackup],
+    'DeviceProtection': [DeviceProtection],
+    'TechSupport': [TechSupport],
+    'StreamingTV': [StreamingTV],
+    'StreamingMovies': [StreamingMovies],
+    'Contract': [Contract],
+    'PaperlessBilling': [PaperlessBilling],
+    'PaymentMethod': [PaymentMethod],
+    'MonthlyCharges': [MonthlyCharges],
+    'TotalCharges': [TotalCharges]
+}
 
-# Arrange features in the right order as model expects
-features = np.array([[gender, senior, tenure, monthly_charges]])
+input_df = pd.DataFrame(input_dict)
 
-# Predict
+# Same preprocessing as training
+# You must load the same encoder or apply same logic
+# For simplicity, assuming you did one-hot encoding:
+input_df_encoded = pd.get_dummies(input_df)
+
+# Align with training columns (you can save X.columns during training)
+model_columns = joblib.load("model_columns.pkl")  # This is a list of feature names used
+input_df_encoded = input_df_encoded.reindex(columns=model_columns, fill_value=0)
+
+# Prediction
 if st.button("Predict Churn"):
-    prediction = model.predict(features)[0]
-    prob = model.predict_proba(features)[0][1]
+    prediction = model.predict(input_df_encoded)[0]
+    prob = model.predict_proba(input_df_encoded)[0][1]
 
     if prediction == 1:
-        st.error(f"⚠️ Customer is likely to churn. (Confidence: {prob:.2f})")
+        st.error(f"⚠️ The customer is likely to churn. (Confidence: {prob:.2f})")
     else:
-        st.success(f"✅ Customer is likely to stay. (Confidence: {prob:.2f})")
+        st.success(f"✅ The customer is likely to stay. (Confidence: {prob:.2f})")
+
