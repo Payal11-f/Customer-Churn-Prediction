@@ -4,7 +4,7 @@ import pandas as pd
 import cloudpickle
 
 # Load your trimport cloudpickle
-with open("model(1).pkl", "rb") as f:
+with open("model_c.pkl", "rb") as f:
     model = cloudpickle.load(f)
 
 
