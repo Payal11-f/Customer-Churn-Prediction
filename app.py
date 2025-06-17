@@ -1,10 +1,13 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-import joblib
+import cloudpickle
 
-# Load your trained model
-model = joblib.load("model.pkl")
+# Load your trimport cloudpickle
+with open("model(1).pkl", "rb") as f:
+    model = cloudpickle.load(f)
+
+
 
 st.title("📉 Customer Churn Prediction App")
 
