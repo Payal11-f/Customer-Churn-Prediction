@@ -14,7 +14,7 @@ st.write("Please enter the values and hit the predict button")
 st.divider()
 
 # Sidebar inputs
-st.sidebar.header("Customer Information")
+st.header("Customer Information")
 
 gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
 SeniorCitizen = st.sidebar.selectbox("Senior Citizen", ["Yes", "No"])
