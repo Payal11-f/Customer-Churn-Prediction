@@ -1,17 +1,15 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-import cloudpickle
+import joblib
 
-# Load your trimport cloudpickle
-with open("model_dp.pkl", "rb") as f:
-    model = cloudpickle.load(f)
+scaler = joblib.load("scaler.pkl")
+model= joblib.load("model.pkl") 
 
-
-
-
-
-st.title("📉 Customer Churn Prediction App")
+st.title("Churn Prediction App")
+st.divider()
+st.write("Please enter the values and hit the predict button")
+st.divider()
 
 # Sidebar inputs
 st.sidebar.header("Customer Information")
@@ -35,10 +33,12 @@ PaperlessBilling = st.sidebar.selectbox("Paperless Billing", ["Yes", "No"])
 PaymentMethod = st.sidebar.selectbox("Payment Method", [
     "Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"
 ])
-MonthlyCharges = st.sidebar.number_input("Monthly Charges", 0.0, 200.0, 70.0)
-TotalCharges = st.sidebar.number_input("Total Charges", 0.0, 10000.0, 1000.0)
+MonthlyCharges = st.number_input("enter monthly charges ", min_value=10,max_value=200,value=30)
+TotalCharges = st.number_input("enter total charges ", min_value =10 , max_value = 9000)
 
-# Convert to DataFrame
+st.divider()
+
+ # Convert to DataFrame
 input_dict = {
     'gender': [gender],
     'SeniorCitizen': [1 if SeniorCitizen == "Yes" else 0],
