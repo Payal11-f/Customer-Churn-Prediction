@@ -16,8 +16,8 @@ st.divider()
 # Sidebar inputs
 st.header("Customer Information")
 
-gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
-SeniorCitizen = st.sidebar.selectbox("Senior Citizen", ["Yes", "No"])
+gender = st.selectbox("Gender", ["Male", "Female"])
+SeniorCitizen = st.selectbox("Senior Citizen", ["Yes", "No"])
 Partner = st.sidebar.selectbox("Partner", ["Yes", "No"])
 Dependents = st.sidebar.selectbox("Dependents", ["Yes", "No"])
 tenure = st.sidebar.slider("Tenure (Months)", 0, 72, 12)
