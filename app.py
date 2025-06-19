@@ -3,8 +3,10 @@ import numpy as np
 import pandas as pd
 import joblib
 
+# Load pre-trained model and scaler
 scaler = joblib.load("scaler.pkl")
-model= joblib.load("model.pkl") 
+model = joblib.load("model.pkl")
+model_columns = joblib.load("model_columns.pkl")  # feature list used during training
 
 st.title("Churn Prediction App")
 st.divider()
@@ -33,12 +35,14 @@ PaperlessBilling = st.sidebar.selectbox("Paperless Billing", ["Yes", "No"])
 PaymentMethod = st.sidebar.selectbox("Payment Method", [
     "Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"
 ])
-MonthlyCharges = st.number_input("enter monthly charges ", min_value=10,max_value=200,value=30)
-TotalCharges = st.number_input("enter total charges ", min_value =10 , max_value = 9000)
+MonthlyCharges = st.number_input("Enter Monthly Charges", min_value=10, max_value=200, value=30)
+TotalCharges = st.number_input("Enter Total Charges", min_value=10, max_value=9000)
 
 st.divider()
 
- # Convert to DataFrame
+# -----------------------------
+# Create input dictionary
+# -----------------------------
 input_dict = {
     'gender': [gender],
     'SeniorCitizen': [1 if SeniorCitizen == "Yes" else 0],
@@ -63,22 +67,47 @@ input_dict = {
 
 input_df = pd.DataFrame(input_dict)
 
-# Same preprocessing as training
-# You must load the same encoder or apply same logic
-# For simplicity, assuming you did one-hot encoding:
+# -----------------------------
+# Preprocessing (same as training)
+# -----------------------------
+input_df['gender'] = input_df['gender'].map({'Female': 1, 'Male': 0})
+# Replace 'No internet service' / 'No phone service' with 'No'
+service_cols = ['MultipleLines', 'OnlineSecurity', 'OnlineBackup', 'DeviceProtection',
+                'TechSupport', 'StreamingTV', 'StreamingMovies']
+for col in service_cols:
+    input_df[col] = input_df[col].replace({'No internet service': 'No', 'No phone service': 'No'})
+
+# Binary columns: convert Yes/No to 1/0
+binary_cols = ['Partner', 'Dependents', 'PhoneService', 'MultipleLines', 'OnlineSecurity',
+               'OnlineBackup', 'DeviceProtection', 'TechSupport', 'StreamingTV',
+               'StreamingMovies', 'PaperlessBilling']
+for col in binary_cols:
+    input_df[col] = input_df[col].map({'Yes': 1, 'No': 0})
+
+# One-hot encode remaining categorical variables
 input_df_encoded = pd.get_dummies(input_df)
 
-# Align with training columns (you can save X.columns during training)
-model_columns = joblib.load("model_columns.pkl")  # This is a list of feature names used
+# Align with training columns
 input_df_encoded = input_df_encoded.reindex(columns=model_columns, fill_value=0)
 
+# Scale the numeric columns
+input_df_scaled = scaler.transform(input_df_encoded)
+
+# -----------------------------
 # Prediction
+# -----------------------------
 if st.button("Predict Churn"):
-    prediction = model.predict(input_df_encoded)[0]
-    prob = model.predict_proba(input_df_encoded)[0][1]
+    prediction = model.predict(input_df_scaled)[0]
+    prob = model.predict_proba(input_df_scaled)[0][1]
 
     if prediction == 1:
         st.error(f"⚠️ The customer is likely to churn. (Confidence: {prob:.2f})")
     else:
         st.success(f"✅ The customer is likely to stay. (Confidence: {prob:.2f})")
+
+churn_result = "Yes" if prediction == 1 else "No"
+
+st.subheader("🔍 Prediction Result")
+st.write(f"**Churn Prediction:** `{churn_result}`")
+st.write(f"**Confidence:** `{prob:.2f}`")
 
