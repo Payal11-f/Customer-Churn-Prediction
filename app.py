@@ -96,17 +96,19 @@ input_df_scaled = scaler.transform(input_df_encoded)
 # -----------------------------
 # Prediction
 # -----------------------------
+
 if st.button("Predict Churn"):
     prediction = model.predict(input_df_scaled)[0]
 
+    churn_result = "Yes" if prediction == 1 else "No"
+
+    st.subheader("🔍 Prediction Result")
+    st.write(f"**Churn Prediction:** `{churn_result}`")
+
     if prediction == 1:
-        st.error(f"⚠️ The customer is likely to churn. ")
+        st.error("⚠️ The customer is likely to churn.")
     else:
-        st.success(f"✅ The customer is likely to stay. ")
+        st.success("✅ The customer is likely to stay.")
 
-churn_result = "Yes" if prediction == 1 else "No"
-
-st.subheader("🔍 Prediction Result")
-st.write(f"**Churn Prediction:** `{churn_result}`")
 
 
