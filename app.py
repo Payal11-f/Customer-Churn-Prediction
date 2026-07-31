@@ -98,9 +98,9 @@ input_df_scaled = scaler.transform(input_df_encoded)
 # -----------------------------
 
 if st.button("Predict Churn"):
-    prediction = model.predict(input_df_scaled)[0]
+    prediction = model.predict(input_df_scaled)
 
-    churn_result = "Yes" if prediction == 1 else "No"
+    # churn_result = "Yes" if prediction == 1 else "No"
 
     st.subheader("🔍 Prediction Result")
     st.write(f"**Churn Prediction:** `{churn_result}`")
