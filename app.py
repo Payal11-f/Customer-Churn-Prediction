@@ -103,7 +103,7 @@ if st.button("Predict Churn"):
     # churn_result = "Yes" if prediction == 1 else "No"
 
     st.subheader("🔍 Prediction Result")
-    st.write(f"**Churn Prediction:** `{churn_result}`")
+    # st.write(f"**Churn Prediction:** `{churn_result}`")
 
     if prediction == 1:
         st.error("⚠️ The customer is likely to churn.")
