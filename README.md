@@ -7,6 +7,7 @@ Built using:
 * Streamlit to create the web app
 * Joblib to save the model and scaler
 
+Below is the streamlit website, it still needs improvement , it has some issue , still-
 Try the website out -->
 [Check it here](https://customer-churn-prediction-p6nygjqpafptuhnrd4m9rf.streamlit.app/)
 
